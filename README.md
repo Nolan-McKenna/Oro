@@ -15,7 +15,7 @@ Oro is an open-source, interpreted programming language designed to simplify and
 
 ## Development Status
 
-Oro is currently in active development. The core language features and documentation are being worked on. 
+Oro is currently in active development. The core language features and documentation are being worked on with an expected release in May 2025. 
 
 ### Coming Soon
 - Installation instructions
@@ -31,3 +31,7 @@ Star and watch this repository to stay updated on Oro's development progress.
 ## License
 
 Oro is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+Oro's interpreter is based off Robert Nystrom's *jlox* interpreter from his book, *Crafting Interpreters*
