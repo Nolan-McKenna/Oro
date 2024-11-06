@@ -5,11 +5,22 @@ import java.util.List;
 import static oro.TokenType.*;
 
 class Parser {
+  private static class ParseError extends RuntimeException {}
+
   private final List<Token> tokens;
   private int current = 0;
 
   Parser(List<Token> tokens) {
     this.tokens = tokens;
+  }
+
+  // TODO: Update to parse multiple statements
+  Expr parse() {
+    try {
+      return expression();
+    } catch (ParseError error) {
+      return null;
+    }
   }
 
   // Grammar rules 
@@ -90,6 +101,9 @@ class Parser {
       consume(RIGHT_PAREN, "Expect ')' after expression.");
       return new Expr.Grouping(expr);
     }
+
+    // Throw error if no grammar rules matched
+    throw error(peek(), "Expect expression.");
   }
 
   private boolean match(TokenType... types) {
@@ -101,6 +115,12 @@ class Parser {
     }
 
     return false;
+  }
+
+  private Token consume(TokenType type, String message) {
+    if (check(type)) return advance();
+
+    throw error(peek(), message);
   }
 
   private boolean check(TokenType type) {
@@ -124,4 +144,34 @@ class Parser {
   private Token previous() {
     return tokens.get(current - 1);
   }
+
+  private ParseError error(Token token, String message) {
+    Oro.error(token, message);
+    return new ParseError();
+  }
+
+  // Synchronize parser after error so it can continue parsing
+  private void synchronize() {
+    advance();
+
+    // Continue parsing until at start of next statement
+    while (!isAtEnd()) {
+      if (previous().type == SEMICOLON) return;
+
+      switch (peek().type) {
+        case CLASS:
+        case FUN:
+        case DEF:
+        case FOR:
+        case IF:
+        case WHILE:
+        case PRINT:
+        case RETURN:
+          return;
+      }
+
+      advance();
+    }
+  }
+
 }
