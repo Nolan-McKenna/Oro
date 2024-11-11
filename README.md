@@ -11,6 +11,7 @@ Oro is an open-source, interpreted programming language designed to simplify and
 - 📦 **Built-in Functions**: Comprehensive suite of text processing utilities
 - 🔍 **Pattern Matching**: Advanced regex and pattern matching capabilities
 - ⚡ **Performance**: Efficient memory usage for large-scale text operations
+- ♻️ **REPL**: For interactive prototyping and testing
 
 ## Development Status
 
