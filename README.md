@@ -24,6 +24,19 @@ Oro is currently in active development. The core language features and documenta
 - Build instructions
 - Contributing guidelines
 
+## Minimum Viable Product
+
+- Complete interpreter with custom syntax
+- Basic data structures
+- Support for classes, inheritance, and importing libraries
+- 3-5 built in functions that compliment the goal of the language
+
+### If MVP Met 
+- Additional built in functions
+- Benchmarking vs other languages
+- Custom libraries
+- VS Code support 
+
 ## Stay Updated
 
 Star and watch this repository to stay updated on Oro's development progress.
