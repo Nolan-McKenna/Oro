@@ -1,0 +1,7 @@
+class Tester {
+  test() {
+    print "Testing, 1, 2, 3.";
+  }
+}
+
+Tester().test();

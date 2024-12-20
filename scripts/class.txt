@@ -1,0 +1,9 @@
+class Test{
+    Test(value) {
+        self.value = value;
+    }
+
+}
+
+def tester = Test("hello");
+print tester.value;
