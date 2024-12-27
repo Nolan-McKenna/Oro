@@ -39,6 +39,7 @@ class Scanner {
     keywords.put("in",  IN);
     keywords.put("break",  BREAK);
     keywords.put("continue",  CONTINUE);
+    keywords.put("extends", EXTENDS);
   }
 
   Scanner(String source) {

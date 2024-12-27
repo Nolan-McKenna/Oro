@@ -5,9 +5,11 @@ import java.util.Map;
 
 class OroClass implements OroCallable {
   final String name;
+  final OroClass superclass;
   private final Map<String, OroFunction> methods;
 
-  OroClass(String name, Map<String, OroFunction> methods) {
+  OroClass(String name, OroClass superclass, Map<String, OroFunction> methods) {
+    this.superclass = superclass;
     this.name = name;
     this.methods = methods;
   }
@@ -15,6 +17,10 @@ class OroClass implements OroCallable {
   OroFunction findMethod(String name) {
     if (methods.containsKey(name)) {
       return methods.get(name);
+    }
+
+    if (superclass != null) {
+      return superclass.findMethod(name);
     }
 
     return null;
