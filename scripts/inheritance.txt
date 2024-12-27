@@ -1,0 +1,14 @@
+class TopLevel {
+    testTop(){
+        print "Hello from the superclass";
+    }
+}
+
+class Inherited extends TopLevel{
+    testInheritance(){
+        super.testTop();
+        print "Hello from the subclass";
+    }
+}
+
+Inherited().testInheritance();
