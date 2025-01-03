@@ -1,0 +1,7 @@
+def a = 0;
+if (a){
+    print "shouldnt execute";
+}
+else{
+    print "a is false";
+}
