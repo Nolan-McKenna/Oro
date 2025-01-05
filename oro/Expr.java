@@ -16,6 +16,7 @@ abstract class Expr {
     R visitSelfExpr(Self expr);
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
+    R visitFStringExpr(Expr.FString expr);
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {
@@ -185,6 +186,19 @@ abstract class Expr {
 
     final Token name;
   }
+
+  static class FString extends Expr {
+    final List<Expr> parts;
+
+    FString(List<Expr> parts) {
+        this.parts = parts;
+    }
+
+    <R> R accept(Visitor<R> visitor) {
+        return visitor.visitFStringExpr(this);
+    }
+}
+
 
   abstract <R> R accept(Visitor<R> visitor);
 }
