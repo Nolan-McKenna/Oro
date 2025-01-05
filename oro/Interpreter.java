@@ -110,6 +110,19 @@ class Interpreter implements Expr.Visitor<Object>,
       return lookUpVariable(expr.name, expr);
     }
 
+    @Override
+    public Object visitFStringExpr(Expr.FString expr) {
+      StringBuilder result = new StringBuilder();
+
+      for (Expr part : expr.parts) {
+        Object value = evaluate(part);
+        result.append(value == null ? "null" : value.toString());
+      }
+
+      return result.toString();
+    }
+
+
     private Object lookUpVariable(Token name, Expr expr) {
       Integer distance = locals.get(expr);
       if (distance != null) {
