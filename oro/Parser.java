@@ -317,6 +317,53 @@ class Parser {
     return call();
   }
 
+  private Expr fString(Token token) {
+    String value = (String) token.literal;
+    List<Expr> parts = new ArrayList<>();
+
+    int index = 0;
+    while (index < value.length()) {
+        char c = value.charAt(index);
+        if (c == '{') {
+            int start = index + 1;
+            int end = value.indexOf('}', start);
+
+            if (end == -1) { // Unterminated expression
+                throw error(token, "Unterminated expression in f-string.");
+            }
+
+            String expression = value.substring(start, end).trim();
+            parts.add(parseExpression(expression));
+            index = end + 1; // Move past '}'
+        } else {
+            int nextBrace = value.indexOf('{', index);
+
+            // Add literal text up to the next '{' or the end of the string
+            String literal = nextBrace == -1
+                ? value.substring(index)
+                : value.substring(index, nextBrace);
+            parts.add(new Expr.Literal(literal));
+
+            index = nextBrace == -1 ? value.length() : nextBrace;
+        }
+    }
+
+    return new Expr.FString(parts);
+}
+
+
+  // Helper method to parse sub-expressions
+  private Expr parseExpression(String expression) {
+      Scanner subScanner = new Scanner(expression);
+      List<Token> tokens = subScanner.scanTokens();
+      Parser subParser = new Parser(tokens);
+      return subParser.parseSingleExpression();
+  }
+
+  public Expr parseSingleExpression() {
+    return expression();
+  } 
+
   private Expr finishCall(Expr callee) {
     List<Expr> arguments = new ArrayList<>();
     if (!check(RIGHT_PAREN)) {
@@ -355,6 +402,10 @@ class Parser {
     if (match(FALSE)) return new Expr.Literal(false);
     if (match(TRUE)) return new Expr.Literal(true);
     if (match(NULL)) return new Expr.Literal(null);
+
+    if (match(TokenType.FSTRING)) {
+      return fString(previous()); 
+  }
 
     if (match(NUMBER, STRING)) {
       return new Expr.Literal(previous().literal);
