@@ -83,6 +83,13 @@ class Scanner {
         // Ignore whitespace.
         break; 
       case '\n': line++; break;
+      case 'f':
+            if (match('"')) {
+                fString();
+            } else {
+                addToken(TokenType.IDENTIFIER); // Default to identifier
+            }
+            break;
       case '"': string(); break;
 
       default:
@@ -140,6 +147,53 @@ class Scanner {
     String value = source.substring(start + 1, current - 1);
     addToken(STRING, value);
   }
+
+  private void fString() {
+    int depth = 0;  
+    int checkPos = current;
+    
+    while (checkPos < source.length()) {
+        char c = source.charAt(checkPos);
+        
+        if (c == '{') {
+            depth++;
+        } else if (c == '}') {
+            depth--;
+            if (depth < 0) {
+                Oro.error(line, "Unmatched closing brace in f-string.");
+                return;
+            }
+        } else if (c == '"' && source.charAt(checkPos - 1) != '\\') {
+            // Found the closing quote
+            if (depth > 0) {
+                Oro.error(line, "Unclosed expression in f-string.");
+                return;
+            }
+            break;
+        }
+        checkPos++;
+    }
+    
+    if (checkPos >= source.length()) {
+        Oro.error(line, "Unterminated f-string.");
+        return;
+    }
+    
+    // If validation passed, process the f-string
+    while (!isAtEnd()) {
+        if (peek() == '"') {
+            advance();  // Consume closing quote
+            String value = source.substring(start + 2, current - 1); // Exclude `f"` and `"`
+            addToken(TokenType.FSTRING, value);
+            return;
+        }
+        advance();
+    }
+    
+    // This should never be reached due to validation above
+    Oro.error(line, "Unterminated f-string.");
+}
+
 
   // Conditional advance
   private boolean match(char expected) {
