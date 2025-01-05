@@ -86,9 +86,7 @@ class Scanner {
       case 'f':
             if (match('"')) {
                 fString();
-            } else {
-                addToken(TokenType.IDENTIFIER); // Default to identifier
-            }
+            } 
             break;
       case '"': string(); break;
 
