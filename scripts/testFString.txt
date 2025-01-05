@@ -1,0 +1,4 @@
+def fStringTest = "tests";
+def languageName = "Oro"; 
+
+print f"This script {fStringTest} the f-string functionality in {languageName}.";
