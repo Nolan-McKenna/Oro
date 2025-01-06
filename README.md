@@ -47,4 +47,4 @@ Oro is licensed under the MIT License. See the [LICENSE](LICENSE) file for detai
 
 ## Acknowledgements
 
-Oro's interpreter is based off Robert Nystrom's *jlox* interpreter from his book, *Crafting Interpreters*
+Oro's interpreter is based off Robert Nystrom's *jlox* interpreter from his book, [*Crafting Interpreters*](https://craftinginterpreters.com/)
