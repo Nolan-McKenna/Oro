@@ -13,6 +13,8 @@ class Scanner {
   private int start = 0;
   private int current = 0;
   private int line = 1;
+  private int column = 0;
+  private int prevCol = 0;
 
   private static final Map<String, TokenType> keywords;
 
@@ -53,7 +55,7 @@ class Scanner {
       scanToken();
     }
 
-    tokens.add(new Token(EOF, "", null, line));
+    tokens.add(new Token(EOF, "", null, line, column));
     return tokens;
   }
 
@@ -82,7 +84,14 @@ class Scanner {
       case '\t':
         // Ignore whitespace.
         break; 
-      case '\n': line++; break;
+      case '\n': 
+        line++; 
+        if (column > 0){
+          prevCol = column; 
+          column = 0;
+        }
+        
+        break;
       case 'f':
             if (match('"')) {
                 fString();
@@ -96,13 +105,18 @@ class Scanner {
         } else if (isAlpha(c)) {
             identifier();
         } else { 
-          Oro.error(line, "Unexpected character.");
+          if (column == 0){
+            Oro.error(line, prevCol, "Unexpected character.");
+          }
+          else{
+            Oro.error(line, column, "Unexpected character.");
+          }
         }
       break;
     }
   }
 
-  private void identifier() {
+  private void identifier() { 
     while (isAlphaNumeric(peek())) advance();
     String text = source.substring(start, current);
     TokenType type = keywords.get(text);
@@ -129,7 +143,13 @@ class Scanner {
 
   private void string() {
     while (peek() != '"' && !isAtEnd()) {
-      if (peek() == '\n') line++;
+      if (peek() == '\n'){
+        line++;
+        if (column > 0){
+          prevCol = column; 
+          column = 0;
+        }
+      }
       advance();
     }
 
@@ -138,10 +158,9 @@ class Scanner {
       return;
     }
 
-    // The closing ".
     advance();
 
-    // Trim the surrounding quotes.
+    // Trim quotes
     String value = source.substring(start + 1, current - 1);
     addToken(STRING, value);
   }
@@ -162,7 +181,6 @@ class Scanner {
                 return;
             }
         } else if (c == '"' && source.charAt(checkPos - 1) != '\\') {
-            // Found the closing quote
             if (depth > 0) {
                 Oro.error(line, "Unclosed expression in f-string.");
                 return;
@@ -173,11 +191,16 @@ class Scanner {
     }
     
     if (checkPos >= source.length()) {
-        Oro.error(line, "Unterminated f-string.");
-        return;
+      if (column == 0){
+        Oro.error(line, prevCol, "Unterminated f-string.");
+      }
+      else{
+        Oro.error(line, column, "Unterminated f-string.");
+      }
+      return;
     }
     
-    // If validation passed, process the f-string
+    // If validated, process f-string
     while (!isAtEnd()) {
         if (peek() == '"') {
             advance();  // Consume closing quote
@@ -188,8 +211,12 @@ class Scanner {
         advance();
     }
     
-    // This should never be reached due to validation above
-    Oro.error(line, "Unterminated f-string.");
+    if (column == 0){
+      Oro.error(line, prevCol, "Unterminated f-string.");
+    }
+    else{
+      Oro.error(line, column, "Unterminated f-string.");
+    }
 }
 
 
@@ -234,6 +261,7 @@ class Scanner {
   }
 
   private char advance() {
+    column++;
     return source.charAt(current++);
   }
 
@@ -243,6 +271,6 @@ class Scanner {
 
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
-    tokens.add(new Token(type, text, literal, line));
+    tokens.add(new Token(type, text, literal, line, column));
   }
 }
