@@ -431,7 +431,7 @@ class Parser {
       return new Expr.Grouping(expr);
     }
 
-    // Throw error if no grammar rules matched
+    // Throw if no grammar rules matched
     throw error(peek(), "Expect expression.");
   }
 
@@ -475,6 +475,10 @@ class Parser {
   }
 
   private ParseError error(Token token, String message) {
+    int i = 1;
+    while (token.column == 0) {
+      token.column = tokens.get(current - i).column;
+    }
     Oro.error(token, message);
     return new ParseError();
   }
