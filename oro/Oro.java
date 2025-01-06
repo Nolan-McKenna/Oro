@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Oro {
   private static final Interpreter interpreter = new Interpreter();
+  private static String gSource;
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
   public static void main(String[] args) throws IOException {
@@ -46,10 +47,12 @@ public class Oro {
   }
 
   private static void run(String source) {
+    gSource = source;
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
+
 
     // Stop if there was a syntax error
     if (hadError) return;
@@ -63,6 +66,10 @@ public class Oro {
     interpreter.interpret(statements);
   }
 
+  static void error(int line, int column, String message) {
+    report(line, column, "", message);
+  }
+
   static void error(int line, String message) {
     report(line, "", message);
   }
@@ -72,17 +79,46 @@ public class Oro {
     hadRuntimeError = true;
   }
 
-  private static void report(int line, String where,
-                             String message) {
-    System.err.println("[line " + line + "] Error" + where + ": " + message);
+  private static void report(int line, int column, String where, String message) {
+    String lineContent;
+    String[] lines = gSource.split("\n");
+    if (line - 1 >= lines.length){
+      lineContent = lines[lines.length - 1];
+      line = lines.length;
+    }
+    else{
+      lineContent = lines[line - 1];
+    }
+
+    System.err.println("[line " + line + ", column " + column + "] Error" + where + ": " + message);
+    System.err.println(line + " | " + lineContent);
+    System.err.print(" ".repeat(column + (Integer.toString(line).length() + 3)));  // Position under the error
+    System.err.println("^--");
     hadError = true;
   }
 
+  private static void report(int line, String where, String message) {
+    String lineContent;
+    String[] lines = gSource.split("\n");
+    if (line - 1 >= lines.length){
+      lineContent = lines[lines.length - 1];
+      line = lines.length;
+    }
+    else{
+      lineContent = lines[line - 1];
+    }
+
+    System.err.println("[line " + line + "] Error" + where + ": " + message);
+    System.err.println(line + " | " + lineContent);
+    hadError = true;
+  }
+
+
   static void error(Token token, String message) {
     if (token.type == TokenType.EOF) {
-      report(token.line, " at end", message);
+      report(token.line, token.column, " at end", message);
     } else {
-      report(token.line, " at '" + token.lexeme + "'", message);
+      report(token.line, token.column, " at '" + token.lexeme + "'", message);
     }
   }
 }
