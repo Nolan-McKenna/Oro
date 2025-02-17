@@ -13,6 +13,11 @@ class Interpreter implements Expr.Visitor<Object>,
     private final Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
+      initBuiltIns();
+    }
+
+    private void initBuiltIns(){
+      // Native functions with implementation using native Java //
       globals.define("clock", new OroCallable() {
         @Override
         public int arity() { return 0; }
@@ -23,8 +28,252 @@ class Interpreter implements Expr.Visitor<Object>,
         }
   
         @Override
-        public String toString() { return "<native fn>"; }
+        public String toString() { return "<native function clock>"; }
       });
+
+      // String toUpper(String text)
+      globals.define("toUpper", new OroCallable() {
+        @Override
+        public int arity() { return 1; }
+
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+            try{
+              return ((String) arguments.get(0)).toUpperCase();
+            }
+            catch (ClassCastException e){
+              return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast as String";
+            }
+        }
+
+        @Override
+        public String toString() { return "<native function toUpper>"; }
+    });
+
+      // Boolean matchRegex(String text1, String text2)
+      globals.define("matchRegex", new OroCallable() {
+        @Override
+        public int arity() { return 2; }
+
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+          try {
+            String input = (String) arguments.get(0);
+            String pattern = (String) arguments.get(1);
+            return input.matches(pattern);
+            }
+            catch (ClassCastException e){
+              if (!(arguments.get(0) instanceof String)) {
+                return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast to String (first argument)";
+              } 
+              else if (!(arguments.get(1) instanceof String)) {
+                return "OroError: " + arguments.get(1).getClass().getSimpleName() + " cannot be cast to String (second argument)";
+              }
+              return "OroError: Unexpected error in arguments.";            
+            }
+        }
+
+        @Override
+        public String toString() { return "<native function matchRegex>"; }
+    });
+
+      // String toLower(String text)
+      globals.define("toLower", new OroCallable() {
+        @Override
+        public int arity() { return 1; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+          try{
+            return ((String) arguments.get(0)).toLowerCase();
+          }
+          catch (ClassCastException e){
+            return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast as String";
+          }        }
+    
+        @Override
+        public String toString() { return "<native function toLowerCase>"; }
+    });
+
+      // String trim(String text)
+      globals.define("trim", new OroCallable() {
+        @Override
+        public int arity() { return 1; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+          try{  
+            return ((String) arguments.get(0)).trim();
+          } 
+          catch (ClassCastException e){
+            return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast as String";
+          }
+        }
+    
+        @Override
+        public String toString() { return "<native function trim>"; }
+    }); 
+
+      // String substring(String text, Int start, Int end)
+      globals.define("substring", new OroCallable() {
+        @Override
+        public int arity() { return 3; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+            String text = (String) arguments.get(0);
+            int start = ((Double) arguments.get(1)).intValue();
+            int end = ((Double) arguments.get(2)).intValue();
+            try{
+              return text.substring(start, end);
+            }
+            catch (StringIndexOutOfBoundsException e){
+              return "OroError: Error calling substring(String text, Int start, Int end)";
+            }
+        }
+
+        @Override
+        public String toString() { return "<native function substring>"; }
+    });
+  
+      // String replace(String text, String target, String replacement)
+      globals.define("replace", new OroCallable() {
+        @Override
+        public int arity() { return 3; }
+
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+          try{
+            String text = (String) arguments.get(0);
+            String target = (String) arguments.get(1);
+            String replacement = (String) arguments.get(2);
+            return text.replace(target, replacement);
+          }
+          catch (ClassCastException e){
+            if (!(arguments.get(0) instanceof String)) {
+              return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast to String (first argument)";
+            } 
+            else if (!(arguments.get(1) instanceof String)) {
+              return "OroError: " + arguments.get(1).getClass().getSimpleName() + " cannot be cast to String (second argument)";
+            }
+            else if (!(arguments.get(1) instanceof String)) {
+              return "OroError: " + arguments.get(2).getClass().getSimpleName() + " cannot be cast to String (third argument)";
+            }
+            return "OroError: Unexpected error in arguments.";       
+          }
+        }
+
+        @Override
+        public String toString() { return "<native function replace>"; }
+    });
+  
+      // Boolean contains(String text, String substring)
+      globals.define("contains", new OroCallable() {
+        @Override
+        public int arity() { return 2; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+        try{   
+          return ((String) arguments.get(0)).contains((String) arguments.get(1));
+        }
+        catch (ClassCastException e){
+          if (!(arguments.get(0) instanceof String)) {
+            return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast to String (first argument)";
+          } 
+          else if (!(arguments.get(1) instanceof String)) {
+            return "OroError: " + arguments.get(1).getClass().getSimpleName() + " cannot be cast to String (second argument)";
+          }
+          else {
+            return "OroError: Unexpected error in arguments.";
+          }
+        }
+      }
+    
+        @Override
+        public String toString() { return "<native function contains>"; }
+    });
+  
+      // Int length(String text)
+      globals.define("length", new OroCallable() {
+        @Override
+        public int arity() { return 1; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> arguments) {
+          try{
+            return ((String) arguments.get(0)).length();
+          }
+          catch (ClassCastException e){
+            return "OroError: " + arguments.get(0).getClass().getSimpleName() + " cannot be cast to String";
+          }
+        }
+    
+        @Override
+        public String toString() { return "<native fun length>"; }
+    });
+
+    // Double sqrt(Int number)
+    globals.define("sqrt", new OroCallable() {
+      @Override
+      public int arity() { return 1; }
+  
+      @Override
+      public Object call(Interpreter interpreter, List<Object> arguments) {
+          try {
+              double number = ((Double) arguments.get(0)).doubleValue();
+              if (number < 0) {
+                  return "OroError: Cannot calculate square root of a negative number.";
+              }
+              return Math.sqrt(number);
+          } catch (ClassCastException e) {
+              return "OroError: Argument must be a Number.";
+          }
+      }
+  
+      @Override
+      public String toString() { return "<native function sqrt>"; }
+  });
+
+  // Double abs(Int num)
+  globals.define("abs", new OroCallable() {
+    @Override
+    public int arity() { return 1; }
+
+    @Override
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        try {
+            double number = ((Double) arguments.get(0)).doubleValue();
+            return Math.abs(number);
+        } catch (ClassCastException e) {
+            return "OroError: Argument must be a Number.";
+        }
+    }
+
+    @Override
+    public String toString() { return "<native function abs>"; }
+});
+
+  
+  
+
+      // Native functions that use external libraries //
+      // String extractPDFText(String filePath)
+      
+      // globals.define("extractPDFText", new OroCallable() {
+      //   @Override
+      //   public int arity() { return 1; }
+  
+      //   @Override
+      //   public Object call(Interpreter interpreter, List<Object> arguments) {
+      //     String filePath = (String) arguments.get(0);
+      //     return PDFUtil.extractText(filePath);
+      //   }
+  
+      //   @Override
+      //   public String toString() { return "<native fun extractPDFText>"; }
+      // });
+
     }
 
     void interpret(List<Stmt> statements) {

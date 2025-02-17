@@ -1,0 +1,6 @@
+print clock();
+print matchRegex("Hi", 1);
+print toLower(1);
+print trim(3);
+print substring("Hello", 1, 9);
+print abs(-sqrt(4));
