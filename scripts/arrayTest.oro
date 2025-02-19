@@ -1,3 +1,7 @@
 def array = [1, 2, 3, 4];
 def duped = array;
 print duped[1];
+
+print size(duped);
+append(duped, 5);
+print duped;
