@@ -317,4 +317,21 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
   }
 
+  @Override
+  public Void visitArrayLiteralExpr(Expr.ArrayLiteral expr) {
+      for (Expr element : expr.elements) {
+          resolve(element); // Resolve each element in the array
+      }
+      return null;
+}
+
+  @Override
+  public Void visitIndexExpr(Expr.Index expr) {
+      resolve(expr.array); // Resolve the array being accessed
+      resolve(expr.index); // Resolve the index expression
+      return null;
+  }
+
+
+
 }

@@ -4,3 +4,4 @@ print toLower(1);
 print trim(3);
 print substring("Hello", 1, 9);
 print abs(-sqrt(4));
+print trim.toString();

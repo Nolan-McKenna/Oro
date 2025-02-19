@@ -255,6 +255,41 @@ class Interpreter implements Expr.Visitor<Object>,
 });
 
   
+  globals.define("append", new OroCallable() {
+    @Override
+    public int arity() { return 2; }
+
+    @Override
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        if (!(arguments.get(0) instanceof OroArray)) {
+            System.out.println("OroError: First argument must be an array.");
+            return null;
+        }
+        ((OroArray) arguments.get(0)).append(arguments.get(1));
+        return null;
+    }
+
+    @Override
+    public String toString() { return "<native function append>"; }
+  });
+
+  globals.define("size", new OroCallable() {
+    @Override
+    public int arity() { return 1; }
+
+    @Override
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        if (!(arguments.get(0) instanceof OroArray)) {
+          System.out.println("OroError: Argument must be an array.");
+            return null;
+        }
+        return ((OroArray) arguments.get(0)).size();
+    }
+
+    @Override
+    public String toString() { return "<native function size>"; }
+  });
+
   
 
       // Native functions that use external libraries //
@@ -644,4 +679,31 @@ class Interpreter implements Expr.Visitor<Object>,
       throw new RuntimeError(expr.name,
           "Only instances have properties.");
     }
+
+    @Override
+    public Object visitArrayLiteralExpr(Expr.ArrayLiteral expr) {
+        List<Object> values = new ArrayList<>();
+        for (Expr element : expr.elements) {
+            values.add(evaluate(element));
+        }
+        return new OroArray(values);
+    }
+
+    @Override
+    public Object visitIndexExpr(Expr.Index expr) {
+        Object array = evaluate(expr.array);
+        Object index = evaluate(expr.index);
+
+        if (!(array instanceof OroArray)) {
+            return "Can only index into arrays.";
+        }
+        if (!(index instanceof Double)) {
+            return "Array index must be a number.";
+        }
+
+        return ((OroArray) array).get((int) ((double) index));
+    }
+    
+
+
 }

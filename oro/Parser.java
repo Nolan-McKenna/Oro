@@ -388,9 +388,14 @@ class Parser {
       if (match(LEFT_PAREN)) {
         expr = finishCall(expr);
       } else if (match(DOT)) {
-        Token name = consume(IDENTIFIER, "Expect property name after '.'.");
-        expr = new Expr.Get(expr, name);
-      } else {
+          Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+          expr = new Expr.Get(expr, name);
+      } else if (match(LEFT_BRACKET)){
+          Expr index = expression(); // Parse the index inside [ ]
+          consume(RIGHT_BRACKET, "Expect ']' after index.");
+          expr = new Expr.Index(expr, index);
+      }
+        else {
         break;
       }
     }
@@ -399,6 +404,17 @@ class Parser {
   }
 
   private Expr primary() {
+    if (match(LEFT_BRACKET)) { // Check for '['
+        List<Expr> elements = new ArrayList<>();
+        if (!check(RIGHT_BRACKET)) { // Non-empty array
+            do {
+                elements.add(expression());
+            } while (match(COMMA));
+        }
+        consume(RIGHT_BRACKET, "Expect ']' after array elements.");
+        return new Expr.ArrayLiteral(elements);
+    }
+
     if (match(FALSE)) return new Expr.Literal(false);
     if (match(TRUE)) return new Expr.Literal(true);
     if (match(NULL)) return new Expr.Literal(null);
@@ -506,5 +522,6 @@ class Parser {
       advance();
     }
   }
+
 
 }

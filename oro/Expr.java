@@ -17,6 +17,8 @@ abstract class Expr {
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
     R visitFStringExpr(Expr.FString expr);
+    R visitArrayLiteralExpr(ArrayLiteral expr);
+    R visitIndexExpr(Index expr);
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {
@@ -199,6 +201,33 @@ abstract class Expr {
     }
 }
 
+static class ArrayLiteral extends Expr {
+  final List<Expr> elements;
+
+  ArrayLiteral(List<Expr> elements) {
+      this.elements = elements;
+  }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitArrayLiteralExpr(this);
+  }
+}
+
+static class Index extends Expr {
+  final Expr array;
+  final Expr index;
+
+  Index(Expr array, Expr index) {
+      this.array = array;
+      this.index = index;
+  }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitIndexExpr(this);
+  }
+}
 
   abstract <R> R accept(Visitor<R> visitor);
 }
