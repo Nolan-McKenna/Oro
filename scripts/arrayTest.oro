@@ -5,3 +5,6 @@ print duped[1];
 print size(duped);
 append(duped, 5);
 print duped;
+
+# TODO: Fix below => invalid assignment target
+duped[1] = 10;
