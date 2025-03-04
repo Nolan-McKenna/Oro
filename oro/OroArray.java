@@ -44,4 +44,9 @@ class OroArray {
     public String toString() {
         return elements.toString();
     }
+
+    // Helper method for index assignment in Interpreter
+    public List<Object> getArray(){
+        return elements;
+    }
 }

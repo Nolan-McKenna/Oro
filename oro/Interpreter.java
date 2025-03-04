@@ -703,6 +703,32 @@ class Interpreter implements Expr.Visitor<Object>,
 
         return ((OroArray) array).get((int) ((double) index));
     }
+
+  @Override
+  public Object visitIndexAssignExpr(Expr.IndexAssign expr) {
+      Object array = evaluate(expr.array);
+      Object index = evaluate(expr.index);
+      Object value = evaluate(expr.value);
+
+      if (!(array instanceof OroArray)) {
+          throw new RuntimeError(expr.equals, "Can only index into arrays.");
+      }
+      if (!(index instanceof Double)) {
+          throw new RuntimeError(expr.equals, "Array index must be a number.");
+      }
+
+      OroArray oroarray = (OroArray) array;
+      List<Object> arrayList = oroarray.getArray();
+      int idx = ((Double) index).intValue();
+
+      if (idx < 0 || idx >= arrayList.size()) {
+          throw new RuntimeError(expr.equals, "Index out of bounds.");
+      }
+
+      arrayList.set(idx, value);
+      return value;
+  }
+
     
 
 

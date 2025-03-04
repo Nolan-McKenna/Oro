@@ -19,6 +19,7 @@ abstract class Expr {
     R visitFStringExpr(Expr.FString expr);
     R visitArrayLiteralExpr(ArrayLiteral expr);
     R visitIndexExpr(Index expr);
+    R visitIndexAssignExpr(IndexAssign expr);
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {
@@ -226,6 +227,25 @@ static class Index extends Expr {
   @Override
   <R> R accept(Visitor<R> visitor) {
       return visitor.visitIndexExpr(this);
+  }
+}
+
+public static class IndexAssign extends Expr {
+  final Expr array;
+  final Expr index;
+  final Token equals;
+  final Expr value;
+
+  public IndexAssign(Expr array, Expr index, Token equals, Expr value) {
+      this.array = array;
+      this.index = index;
+      this.equals = equals;
+      this.value = value;
+  }
+
+  @Override
+  <R> R accept(Visitor<R> visitor) {
+      return visitor.visitIndexAssignExpr(this);
   }
 }
 

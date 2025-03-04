@@ -332,6 +332,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
       return null;
   }
 
-
+  @Override
+  public Void visitIndexAssignExpr(Expr.IndexAssign expr) {
+      resolve(expr.array);  // Resolve the array being indexed
+      resolve(expr.index);  // Resolve the index part
+      resolve(expr.value);  // Resolve the value being assigned
+      return null;
+  }
 
 }

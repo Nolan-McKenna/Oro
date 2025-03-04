@@ -4,7 +4,12 @@ print duped[1];
 
 print size(duped);
 append(duped, 5);
-print duped;
+print duped[1 + 1];
 
 # TODO: Fix below => invalid assignment target
 duped[1] = 10;
+print(duped);
+
+duped[1] = 100 /2;
+print(duped);
+

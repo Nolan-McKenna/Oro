@@ -7,7 +7,7 @@ import java.util.List;
 import static oro.TokenType.*;
 
 class Parser {
-  private static class ParseError extends RuntimeException {}
+  private static class ParseError extends RuntimeException {private static final long serialVersionUID = 1L;}
 
   private final List<Token> tokens;
   private int current = 0;
@@ -225,6 +225,11 @@ class Parser {
       else if (expr instanceof Expr.Get) {
         Expr.Get get = (Expr.Get)expr;
         return new Expr.Set(get.object, get.name, value);
+      }
+
+      else if (expr instanceof Expr.Index) {
+        Expr.Index indexExpr = (Expr.Index) expr;
+        return new Expr.IndexAssign(indexExpr.array, indexExpr.index, equals, value);
       }
 
       error(equals, "Invalid assignment target."); 
