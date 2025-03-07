@@ -99,7 +99,8 @@ class Scanner {
                 fString();
             } 
             break;
-      case '"': string(); break;
+      case '"': string(c); break;
+      case '\'': string(c); break;
 
       default:
         if (isDigit(c)) {
@@ -143,8 +144,8 @@ class Scanner {
         Double.parseDouble(source.substring(start, current)));
   }
 
-  private void string() {
-    while (peek() != '"' && !isAtEnd()) {
+  private void string(char quoteType) {
+    while (peek() != quoteType && !isAtEnd()) {
       if (peek() == '\n'){
         line++;
         if (column > 0){
