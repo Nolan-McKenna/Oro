@@ -25,5 +25,5 @@ enum TokenType {
   // *
   THEN, IMPORT, AS, IN, BREAK, CONTINUE,
 
-  EOF
+  EOF, ERR
 }
