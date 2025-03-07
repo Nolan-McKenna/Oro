@@ -8,4 +8,10 @@ class RuntimeError extends RuntimeException {
       super(message);
       this.token = token;
     }
+
+    // Message Only RuntimeError
+    RuntimeError(String message) {
+      super(message);
+      this.token = null;
+    }
   }
