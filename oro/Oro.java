@@ -14,6 +14,7 @@ public class Oro {
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
   public static void main(String[] args) throws IOException {
+    RegexFunctions.registerAll(interpreter);
     if (args.length > 1) {
       System.out.println("Usage: oro [script]");
       System.exit(64); 
@@ -75,7 +76,13 @@ public class Oro {
   }
 
   static void runtimeError(RuntimeError error) {
-    System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+    if (error.token != null){
+      System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+    }
+    else{
+      System.err.println(error.getMessage());
+    }
+    
     hadRuntimeError = true;
   }
 
