@@ -1,0 +1,6 @@
+def json = parseJSON('{"name" : "Nolan", "age" : 21, "major" : "Computer Science", "hobbies" : ["Coding", "Running", "Playing Video Games"], "outside" : {"innerkey" : [["innerinnervalue0", "innerinnervalue1"], "innervalue1"]}}');
+
+
+printJSON(json);
+printJSON(json["outside"]["innerkey"][0][0]);
+printJSON(json["name"]);
