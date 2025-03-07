@@ -10,6 +10,10 @@ class OroArray {
         this.elements = new ArrayList<>(elements);
     }
 
+    OroArray() {
+        this.elements = new ArrayList<>();
+    }
+
     Object get(int index) {
         if (index < 0 || index >= elements.size()) {
             return "OroError: Array index out of bounds: " + index;
