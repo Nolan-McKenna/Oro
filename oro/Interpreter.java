@@ -16,6 +16,13 @@ class Interpreter implements Expr.Visitor<Object>,
       initBuiltIns();
     }
 
+
+    private static void checkArgCount(List<Object> args, int expected, String usage) {
+      if (args.size() != expected) {
+          throw new RuntimeError("Expected " + expected + " arguments for " + usage);
+      }
+    }
+
     private void initBuiltIns(){
       // Native functions with implementation using native Java //
       globals.define("clock", new OroCallable() {
@@ -93,6 +100,30 @@ class Interpreter implements Expr.Visitor<Object>,
     
         @Override
         public String toString() { return "<native function toLowerCase>"; }
+    });
+
+      globals.define("toString", new OroCallable() {
+        @Override
+        public int arity() { return 1; }
+    
+        @Override
+        public Object call(Interpreter interpreter, List<Object> args) {
+            checkArgCount(args, 1, "toString(value)");
+    
+            Object value = args.get(0);
+            if (value instanceof Double) {
+                return value.toString(); // Convert number to string
+            } else if (value instanceof Boolean) {
+                return value.toString(); // Convert boolean to string
+            } else if (value instanceof String) {
+                return value; // If it's already a string, return as is
+            } else {
+                return value.toString(); // For other objects, call their toString method
+            }
+        }
+    
+        @Override
+        public String toString() { return "<native function toString>"; }
     });
 
       // String trim(String text)
@@ -289,6 +320,36 @@ class Interpreter implements Expr.Visitor<Object>,
     @Override
     public String toString() { return "<native function size>"; }
   });
+
+  globals.define("parseJSON", new OroCallable() {
+    @Override
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        if (arguments.size() != 1 || !(arguments.get(0) instanceof String)) {
+            throw new RuntimeError("OroError: parseJSON requires a single string argument");
+        }
+        return JSONParser.parseJSON((String)arguments.get(0));
+    }
+
+    @Override
+    public int arity() {
+        return 1;
+    }
+  });
+
+  globals.define("printJSON", new OroCallable() {
+    @Override
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        for (Object arg : arguments) {
+            System.out.println(JSONParser.toJson(arg));  // Use toJson for proper formatting
+        }
+        return null;
+    }
+
+    @Override
+    public int arity() {
+        return 1;
+    }
+});
 
   
 
@@ -694,6 +755,17 @@ class Interpreter implements Expr.Visitor<Object>,
         Object array = evaluate(expr.array);
         Object index = evaluate(expr.index);
 
+        if (array instanceof Map) {
+        // Safe suppress since the only way array isinstance of map is if parsed as a Json (String, Object)by JSONParser
+        @SuppressWarnings("unchecked")
+          Map<String, Object> map = (Map<String, Object>) array;
+          if (!(index instanceof String)) {
+              return "Object keys must be strings.";
+          }
+          return map.get(index);
+      }
+        
+        
         if (!(array instanceof OroArray)) {
             return "Can only index into arrays.";
         }
@@ -709,6 +781,17 @@ class Interpreter implements Expr.Visitor<Object>,
       Object array = evaluate(expr.array);
       Object index = evaluate(expr.index);
       Object value = evaluate(expr.value);
+
+      if (array instanceof Map) {
+        // Safe suppress since the only way array isinstance of map is if parsed as a Json (String, Object)by JSONParser
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) array;
+        if (!(index instanceof String)) {
+            return "Object keys must be strings.";
+        }
+        map.put((String) index, value);
+        return value;
+    }
 
       if (!(array instanceof OroArray)) {
           throw new RuntimeError(expr.equals, "Can only index into arrays.");
