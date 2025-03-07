@@ -1,0 +1,17 @@
+# Script for testing the native regext functions in RegexFunctions.java using the regex class Regex.java
+## TODO: add shorthand args to be handled on back end (USPhoneNumber, USSSN, Email, etc.) to avoid complex regex patterns
+def pattern = "((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}";
+def phoneNumber = "617-833-8807";
+
+print "Regex Match: " + toString(regex_match(pattern, phoneNumber));
+
+def text = "Hello, my name is Nolan. My phone number is 617-888-8888. My work phone number is (617) 999-9999";
+
+print "Regex Find: " + toString(regex_find(pattern, text, 1));
+print "Regex Find All: " + toString(regex_find_all(pattern, text));
+
+text = regex_replace(pattern, "XXX-XXX-XXXX", text, 1);
+print "Regex Replace: " + text;
+
+text = regex_replace_all(pattern, "XXX-XXX-XXXX", text);
+print "Regex Replace All: " + text;

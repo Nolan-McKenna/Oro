@@ -1,0 +1,9 @@
+#def pattern = "((\(\d{3}\) ?)|(\d{3}-))?\d{3}-\d{4}";
+def text = "Patient: Nolan McKenna. Phone: (617) 833-8807. SSN: 123-45-6789. Address: 71 Myrtlebank Ave, Boston, MA 02124";
+
+text = regex_replace_all("USPhoneNumber", "(XXX) XXX-XXXX", text);
+text = regex_replace_all("USSSN", "XXX-XX-XXXX", text);
+text = regex_replace_all("Address", "[Redacted Address]", text);
+
+print text;
+
