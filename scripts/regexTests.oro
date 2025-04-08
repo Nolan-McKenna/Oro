@@ -15,3 +15,7 @@ print "Regex Replace: " + text;
 
 text = regex_replace_all(pattern, "XXX-XXX-XXXX", text);
 print "Regex Replace All: " + text;
+
+def newText = "I have $30,123.12 in my bank account. My friend has $0.78. My mother has $123,456,789.12";
+newText = regex_replace_all("USDollarAmount", "$[Redacted Amount]", newText);
+print newText;

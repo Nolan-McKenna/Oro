@@ -1,0 +1,17 @@
+# PDF handling not implemented yet -> proof of concept code for presentation
+
+def PDF = PDFDocument("disclose.pdf");
+
+# Patient names, phone numbers, addresses,
+# and any other Personally Identifiable 
+# Information (PII)
+def redactedPDF = PDFRedact("HIPAA", pdf, "[REDACTED]");
+save(redactedPDF, "disclose_redacted.pdf");
+
+# OCR Case 
+
+def PDF = PDFDocument("disclose.pdf");
+
+# Pass "OCR" for Optical Character Recognition
+def redactedPDF = PDFRedact("HIPAA", pdf, "OCR");
+save(redactedPDF, "disclose_redacted.pdf");

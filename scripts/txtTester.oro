@@ -1,0 +1,9 @@
+def doc = Document("scripts/txtTest.txt");
+def text = getDocText(doc);
+def num = 1;
+
+text = regex_replace("USSSN", "XXX-XX-XXXX", text, 1);
+text = regex_replace("USPhoneNumber", "(XXX) XXX-XXXX", text, 1);
+
+createTxtDoc("scripts/txtTestRedacted.txt", txt);
+
