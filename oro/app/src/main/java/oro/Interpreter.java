@@ -553,7 +553,6 @@ class Interpreter implements Expr.Visitor<Object>,
         });
 
         // Given a PDF instance, redact all information required under HIPAA and save to a new PDF
-        // TODO: For testing, simply return the names found in the document to ensure StandfordNLP working
         globals.define("redactHIPAA", new OroCallable() {
             @Override
             public int arity() {
@@ -620,24 +619,6 @@ class Interpreter implements Expr.Visitor<Object>,
             }
         });
 
-
-
-      // Native functions that use external libraries //
-      // String extractPDFText(String filePath)
-      
-      // globals.define("extractPDFText", new OroCallable() {
-      //   @Override
-      //   public int arity() { return 1; }
-  
-      //   @Override
-      //   public Object call(Interpreter interpreter, List<Object> arguments) {
-      //     String filePath = (String) arguments.get(0);
-      //     return PDFUtil.extractText(filePath);
-      //   }
-  
-      //   @Override
-      //   public String toString() { return "<native fun extractPDFText>"; }
-      // });
 
     }
 
