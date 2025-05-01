@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import static oro.OroPDFDocument.redactHIPAA;
+import static oro.OroPDFDocument.redactHIPAARef;
+
 class Interpreter implements Expr.Visitor<Object>,
                              Stmt.Visitor<Void> {
     final Environment globals = new Environment();
@@ -363,7 +366,7 @@ class Interpreter implements Expr.Visitor<Object>,
     }
   });
 
-  globals.define("Document", new OroCallable() {
+  globals.define("TxtDocument", new OroCallable() {
     @Override
     public int arity() {
         return 1; // File Path
@@ -387,11 +390,11 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public String toString() {
-        return "<native class Document>";
+        return "<native class TxtDocument>";
     }
   });
 
-  globals.define("getDocText", new OroCallable() {
+  globals.define("getTxtText", new OroCallable() {
     @Override
     public int arity() {
         return 1; // Document Instance 
@@ -400,7 +403,7 @@ class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         if (!(arguments.get(0) instanceof OroDocument))  {
-          throw new RuntimeError("Error: Expected argument of type Document");
+          throw new RuntimeError("Error: Expected argument of type TxtDocument");
         }
         else{
           OroDocument doc = (OroDocument) arguments.get(0);
@@ -411,7 +414,7 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public String toString() {
-        return "<native fun getDocText>";
+        return "<native fun getTxtText>";
     }
   });
 
@@ -438,10 +441,184 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public String toString() {
-        return "<native fun replaceDocText>";
+        return "<native fun createTxtDoc>";
     }
   });
 
+
+        globals.define("PDFDocument", new OroCallable() {
+            @Override
+            public int arity() {
+                return 1; // File Path
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (((String) arguments.get(0)).toLowerCase().endsWith(".pdf") != true) {
+                    throw new RuntimeError("Error: Unsupported file type");
+                }
+                else{
+                    try{
+                        return new OroPDFDocument((String) arguments.get(0)); // Returns a new instance of Document
+                    }
+                    catch (IOException e){
+                        throw new RuntimeError("Error loading PDF: " + e.getMessage());
+                    }
+                }
+
+            }
+
+            @Override
+            public String toString() {
+                return "<native class PDFDocument>";
+            }
+        });
+
+        globals.define("getPDFText", new OroCallable() {
+            @Override
+            public int arity() {
+                return 1; // Document Instance
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (!(arguments.get(0) instanceof OroPDFDocument))  {
+                    throw new RuntimeError("Error: Expected argument of type PDF");
+                }
+                else{
+                    try {
+                        OroPDFDocument pdf = (OroPDFDocument) arguments.get(0);
+                        return pdf.getPDFText();
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error getting PDF text: " + e.getMessage());
+                    }
+                }
+
+            }
+
+            @Override
+            public String toString() {
+                return "<native fun getPDFText>";
+            }
+        });
+
+        globals.define("workingDir", new OroCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return System.getProperty("user.dir");
+
+            }
+
+            @Override
+            public String toString() {
+                return "<native fun workingDir>";
+            }
+        });
+
+        globals.define("createPDF", new OroCallable() {
+            @Override
+            public int arity() {
+                return 2; // File path, replacement text
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (!(arguments.get(0) instanceof String) || !(arguments.get(1) instanceof String))  {
+                    throw new RuntimeError("Error: Expected arguments of type String");
+                }
+                else{
+
+                    String filePath = (String) arguments.get(0);
+                    String replacementText = (String) arguments.get(1);
+                    // 1 if successful, 0 if not
+                    try {
+                        OroPDFDocument.createPDF(filePath, replacementText);
+                    }
+                    catch (IOException e){
+                        throw new RuntimeError("Error creating PDF: " + e.getMessage());
+                    }
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "<native fun createPDF>";
+            }
+        });
+
+        // Given a PDF instance, redact all information required under HIPAA and save to a new PDF
+        // TODO: For testing, simply return the names found in the document to ensure StandfordNLP working
+        globals.define("redactHIPAA", new OroCallable() {
+            @Override
+            public int arity() {
+                return 2; // PDF instance, redacted file path
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (!(arguments.get(0) instanceof OroPDFDocument) || !(arguments.get(1) instanceof String))  {
+                    throw new RuntimeError("Error: Expected arguments of type PDF, String");
+                }
+                else{
+
+                    OroPDFDocument pdf = (OroPDFDocument) arguments.get(0);
+                    String redactedPath = (String) arguments.get(1);
+                    // 1 if successful, 0 if not
+                    try {
+                        redactHIPAA(pdf, redactedPath);
+                    }
+                    catch (IOException e){
+                        throw new RuntimeError("Error redacting HIPAA: " + e.getMessage());
+                    }
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "<native fun redactHIPAA>";
+            }
+        });
+
+        // Has optional parameter to act as blank document template
+        globals.define("redactHIPAA", new OroCallable() {
+            @Override
+            public int arity() {
+                return 3; // PDF instance form, redacted file path, PDF instance template
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (!(arguments.get(0) instanceof OroPDFDocument) || !(arguments.get(1) instanceof String))  {
+                    throw new RuntimeError("Error: Expected arguments of type PDF, String");
+                }
+                else{
+
+                    OroPDFDocument pdf = (OroPDFDocument) arguments.get(0);
+                    String redactedPath = (String) arguments.get(1);
+                    OroPDFDocument template = (OroPDFDocument) arguments.get(2);
+                    // 1 if successful, 0 if not
+                    try {
+                        redactHIPAARef(pdf, redactedPath, template);
+                    }
+                    catch (IOException e){
+                        throw new RuntimeError("Error redacting HIPAA: " + e.getMessage());
+                    }
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "<native fun redactHIPAA>";
+            }
+        });
 
 
 

@@ -1,0 +1,21 @@
+#print workingDir();
+#def pdf = PDFDocument("../../scripts/medical-records-release-form-test.pdf");
+#def pdfText = getPDFText(pdf);
+
+#print pdfText;
+
+#pdfText = regex_replace_all("USPhoneNumber", "(XXX) XXX-XXXX", pdfText);
+#pdfText = regex_replace_all("USSSN", "XXX-XX-XXXX", pdfText);
+#pdfText = regex_replace_all("Address", "[Redacted Address]", pdfText);
+
+#createPDF("../../scripts/release-redacted-test.pdf", pdfText);
+
+#_____________________________________________________________________
+
+#def pdf = PDFDocument("../../scripts/medical-records-release-form-test.pdf");
+#redactHIPAA(pdf, "../../scripts/medical-records-release-form-test_HIPAA.pdf");
+
+#_____________________________________________________________________
+def pdf = PDFDocument("../../scripts/medical-records-release-form-test.pdf");
+def template = PDFDocument("../../scripts/medical-records-release-form-test_blank.pdf");
+redactHIPAA(pdf, "../../scripts/medical-records-release-form-test_HIPAA.pdf", template);

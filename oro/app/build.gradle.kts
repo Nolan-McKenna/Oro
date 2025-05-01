@@ -21,6 +21,10 @@ dependencies {
     implementation(libs.guava)
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
     implementation("org.apache.pdfbox:pdfbox:2.0.1")
+    implementation("edu.stanford.nlp:stanford-corenlp:4.5.4")
+    implementation("edu.stanford.nlp:stanford-corenlp:4.5.4:models") // includes models like NER
+    implementation ("net.sourceforge.tess4j:tess4j:5.4.0")
+
 }
 
 testing {
@@ -42,6 +46,15 @@ java {
 
 application {
     // Define the main class for the application.
-    //mainClass = "oro.Oro"
-    mainClass = "oro.PDFUtil"
+     mainClass = "oro.Oro"
+    // mainClass = "oro.PDFRedactionTool"
+
 }
+
+tasks.named<JavaExec>("run") {
+    jvmArgs = listOf(
+        "-Djna.library.path=/usr/local/lib",
+        "-Dtessdata.path=/usr/local/share/tessdata"
+    )
+}
+

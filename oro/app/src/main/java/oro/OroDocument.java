@@ -1,3 +1,5 @@
+// Oro .txt document class
+
 package oro;
 
 import java.io.IOException;
